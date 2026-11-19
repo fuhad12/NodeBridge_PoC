@@ -22,6 +22,11 @@ router.post("/jobs", async (req, res) => {
     return res.status(400).json({ error: "title, task, and expected are required" });
   }
 
+  // Reject repeat jobIds so an existing job is never overwritten
+  if (getJob(String(jobId))) {
+    return res.status(409).json({ error: "Job already exists" });
+  }
+
   const job = { jobId: String(jobId), ...spec };
   await saveJob(job);
   return res.status(201).json({ job });
